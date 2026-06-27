@@ -1,17 +1,36 @@
+"""
+Flask server for Emotion Detection web application.
+"""
+
 from flask import Flask, render_template, request
 from EmotionDetection import emotion_detector
+
 app = Flask(__name__)
+
+
 @app.route("/")
 def render_index_page():
+    """
+    Render the main index page of the Emotion Detection web application.
+    """
     return render_template("index.html")
+
 
 @app.route("/emotionDetector")
 def emotion_detector_route():
+    """
+    Process user input text and return emotion analysis result.
+    Returns error message for invalid input.
+    """
+
     text_to_analyze = request.args.get("textToAnalyze")
 
     response = emotion_detector(text_to_analyze)
 
-    formatted_response = (
+    if response["dominant_emotion"] is None:
+        return "Invalid text! Please try again!"
+
+    return (
         f"For the given statement, the system response is "
         f"'anger': {response['anger']}, "
         f"'disgust': {response['disgust']}, "
@@ -20,6 +39,7 @@ def emotion_detector_route():
         f"'sadness': {response['sadness']}. "
         f"The dominant emotion is {response['dominant_emotion']}."
     )
-    return formatted_response
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
